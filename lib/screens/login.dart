@@ -3,7 +3,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_screen_2/screens/recover_password_screen.dart';
-import 'package:sign_in_screen_2/screens/register.dart';
 import 'package:sign_in_screen_2/screens/welcome_screen.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -14,18 +13,20 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  bool _loginAuthMode = true;
   bool _showEmailError = false;
   bool _showPasswordError = false;
+  bool _showConfirmPasswordError = false;
+  final TextEditingController _emailController = TextEditingController();
 
-  TextEditingController emailController = TextEditingController();
-
-  TextEditingController passwordController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  dynamic _groupValue = -1;
 
   final _formkey = GlobalKey<FormState>();
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -37,8 +38,8 @@ class _LogInScreenState extends State<LogInScreen> {
     if (!_showEmailError && !_showPasswordError) {
       Navigator.pushReplacementNamed(context, WelcomeScreen.routeName,
           arguments: User(
-            emailAdress: emailController.text.toString(),
-            password: passwordController.text.toString(),
+            emailAdress: _emailController.text.toString(),
+            password: _passwordController.text.toString(),
           ));
     }
   }
@@ -99,17 +100,17 @@ class _LogInScreenState extends State<LogInScreen> {
                             ),
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           flex: 3,
                           child: Align(
                             alignment: Alignment.topRight,
                             child: Padding(
-                              padding: EdgeInsets.only(
+                              padding: const EdgeInsets.only(
                                 right: 40,
                               ),
                               child: Text(
-                                'Login',
-                                style: TextStyle(
+                                _loginAuthMode ? 'Login' : 'Sign Up',
+                                style: const TextStyle(
                                   fontSize: 13,
                                   color: Colors.white,
                                 ),
@@ -120,194 +121,379 @@ class _LogInScreenState extends State<LogInScreen> {
                       ]),
                 ),
                 SizedBox(
-                  height: deviceHeight * 0.06,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: borderRadiusSize,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 7,
-                          offset: const Offset(1, 4),
-                        ),
-                      ]
-                      // boxShadow: :
-                      ),
-                  width: deviceWidth * 0.8,
-                  height: deviceHeight * 0.06,
-                  child: TextFormField(
-                    maxLines: 1,
-                    keyboardType: TextInputType.emailAddress,
-                    controller: emailController,
-                    style: const TextStyle(fontSize: 10),
-                    decoration: InputDecoration(
-                      //labelText: ' Enter your Email',
-
-                      border: InputBorder.none,
-                      hintText: "Email",
-                      hintStyle: greyMinStyle,
-                      contentPadding: const EdgeInsets.all(0),
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        size: 15,
-                      ),
-                      fillColor: Colors.white,
-                      filled: false,
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty || !value.contains('@')) {
-                        setState(() {
-                          _showEmailError = true;
-                        });
-                      } else {
-                        setState(() {
-                          _showEmailError = false;
-                        });
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Visibility(
-                    visible: _showEmailError,
-                    child: const Text(
-                      "invalid email",
-                      style: TextStyle(color: Colors.red, fontSize: 10),
-                    )),
-                SizedBox(
                   height: deviceHeight * 0.03,
                 ),
                 Container(
                   decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: borderRadiusSize,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 7,
-                          offset: const Offset(1, 4),
-                        ),
-                      ]
-                      // boxShadow: :
-                      ),
-                  width: deviceWidth * 0.8,
-                  height: deviceHeight * 0.06,
-                  child: TextFormField(
-                    maxLines: 1,
-                    obscureText: true,
-                    controller: passwordController,
-                    style: const TextStyle(fontSize: 10),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Password",
-                      hintStyle: greyMinStyle,
-                      contentPadding: const EdgeInsets.all(0),
-                      prefixIcon: const Icon(
-                        Icons.key_outlined,
-                        size: 15,
-                      ),
-                      fillColor: Colors.white,
-                      filled: false,
+                    color: Colors.greenAccent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  height: deviceHeight * 0.54,
+                  width: deviceWidth * 0.9,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: _loginAuthMode
+                          ? deviceHeight * 0.06
+                          : deviceHeight * 0.03,
                     ),
-                    validator: (value) {
-                      if (value!.isEmpty || value.length < 8) {
-                        setState(() {
-                          _showPasswordError = true;
-                        });
-                      } else {
-                        setState(() {
-                          _showPasswordError = false;
-                        });
-                      }
+                    child: SingleChildScrollView(
+                      child: Column(children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: borderRadiusSize,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: const Offset(1, 4),
+                                ),
+                              ]
+                              // boxShadow: :
+                              ),
+                          width: deviceWidth * 0.8,
+                          height: deviceHeight * 0.06,
+                          child: TextFormField(
+                            maxLines: 1,
+                            keyboardType: TextInputType.emailAddress,
+                            controller: _emailController,
+                            style: const TextStyle(fontSize: 10),
+                            decoration: InputDecoration(
+                              //labelText: ' Enter your Email',
 
-                      return null;
-                    },
-                  ),
-                ),
-                Visibility(
-                    visible: _showPasswordError,
-                    child: const Text(
-                      "password is too short",
-                      style: TextStyle(color: Colors.red, fontSize: 10),
-                    )),
-                SizedBox(
-                  height: deviceHeight * 0.02,
-                ),
-                Container(
-                    height: deviceHeight * 0.03,
-                    child: GestureDetector(
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            right: deviceWidth * 0.1,
-                          ),
-                          child: Text(
-                            'Forgot Password ?',
-                            style: greyMinStyle,
-                          ),
-                        ),
-                      ),
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, RecoverPasswordScreen.routeName);
-                      },
-                    )),
-                SizedBox(
-                  height: deviceHeight * 0.1,
-                ),
-                Container(
-                  height: deviceHeight * 0.06,
-                  width: deviceWidth * 0.8,
-                  decoration: BoxDecoration(
-                    borderRadius: borderRadiusSize,
-                    color: Colors.black,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: borderRadiusSize)),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              colors: [Colors.red, Colors.yellow]),
-                          borderRadius: borderRadiusSize),
-                      child: Container(
-                        // width: 00,
-                        height: 50,
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'Log In',
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: deviceHeight * 0.1,
-                ),
-                Container(
-                  height: deviceHeight * 0.03,
-                  child: Center(
-                    child: RichText(
-                      text: TextSpan(style: greyMinStyle, children: [
-                        const TextSpan(
-                          text: 'Don\'t have an account ? ',
-                        ),
-                        TextSpan(
-                          text: ' Register',
-                          style: orangeMinStyle,
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.pushNamed(
-                                  context, RegisterScreen.routeName);
+                              border: InputBorder.none,
+                              hintText: "Email",
+                              hintStyle: greyMinStyle,
+                              contentPadding: const EdgeInsets.all(0),
+                              prefixIcon: const Icon(
+                                Icons.email_outlined,
+                                size: 15,
+                              ),
+                              fillColor: Colors.white,
+                              filled: false,
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty || !value.contains('@')) {
+                                setState(() {
+                                  _showEmailError = true;
+                                });
+                              } else {
+                                setState(() {
+                                  _showEmailError = false;
+                                });
+                              }
+                              return null;
                             },
+                          ),
+                        ),
+                        Visibility(
+                            visible: _showEmailError,
+                            child: const Text(
+                              "invalid email",
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            )),
+                        SizedBox(
+                          height: deviceHeight * 0.03,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: borderRadiusSize,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: const Offset(1, 4),
+                                ),
+                              ]
+                              // boxShadow: :
+                              ),
+                          width: deviceWidth * 0.8,
+                          height: deviceHeight * 0.06,
+                          child: TextFormField(
+                            maxLines: 1,
+                            obscureText: true,
+                            controller: _passwordController,
+                            style: const TextStyle(fontSize: 10),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Password",
+                              hintStyle: greyMinStyle,
+                              contentPadding: const EdgeInsets.all(0),
+                              prefixIcon: const Icon(
+                                Icons.key_outlined,
+                                size: 15,
+                              ),
+                              fillColor: Colors.white,
+                              filled: false,
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty || value.length < 8) {
+                                setState(() {
+                                  _showPasswordError = true;
+                                });
+                              } else {
+                                setState(() {
+                                  _showPasswordError = false;
+                                });
+                              }
+
+                              return null;
+                            },
+                          ),
+                        ),
+                        Visibility(
+                            visible: _showPasswordError,
+                            child: const Text(
+                              "Incorrect Password!",
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            )),
+                        Visibility(
+                          visible: !_loginAuthMode,
+                          child: SizedBox(
+                            height: deviceHeight * 0.03,
+                          ),
+                        ),
+                        Visibility(
+                          visible: !_loginAuthMode,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: borderRadiusSize,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 2,
+                                    blurRadius: 7,
+                                    offset: const Offset(1, 4),
+                                  ),
+                                ]),
+                            width: deviceWidth * 0.8,
+                            height: deviceHeight * 0.06,
+                            child: TextFormField(
+                              maxLines: 1,
+                              obscureText: true,
+                              style: const TextStyle(fontSize: 10),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Confirm Password",
+                                hintStyle: greyMinStyle,
+                                contentPadding: const EdgeInsets.all(0),
+                                prefixIcon: Icon(
+                                  !_loginAuthMode ? Icons.key_outlined : null,
+                                  size: 15,
+                                ),
+                                fillColor: Colors.white,
+                                filled: false,
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty ||
+                                    value != _passwordController.text) {
+                                  setState(() {
+                                    _showConfirmPasswordError = true;
+                                  });
+                                } else {
+                                  setState(() {
+                                    _showConfirmPasswordError = false;
+                                  });
+                                }
+
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                            visible: _showConfirmPasswordError,
+                            child: const Text(
+                              "Passwords do not match!",
+                              style: TextStyle(color: Colors.red, fontSize: 10),
+                            )),
+                        SizedBox(
+                          height: !_loginAuthMode ? deviceHeight * 0.03 : 02,
+                        ),
+                        Visibility(
+                            visible: !_loginAuthMode,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                left: deviceWidth * 0.06,
+                                right: deviceWidth * 0.03,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      'Gender :',
+                                      style: greyMinStyle,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Transform.scale(
+                                      scale: 0.5,
+                                      child: RadioListTile(
+                                        value: 0,
+                                        groupValue: _groupValue,
+                                        title: const Text("Male",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 15,
+                                            )),
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            _groupValue = newValue;
+                                          });
+                                        },
+                                        selected: true,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: RadioListTile(
+                                      visualDensity:
+                                          const VisualDensity(horizontal: -4.0),
+                                      value: 1,
+                                      groupValue: _groupValue,
+                                      title: Text(
+                                        "Female",
+                                        style: greyMinStyle,
+                                      ),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          _groupValue = newValue;
+                                        });
+                                      },
+                                      selected: false,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )),
+                        Visibility(
+                          visible: !_loginAuthMode,
+                          child: SizedBox(
+                            height: deviceHeight * 0.03,
+                          ),
+                        ),
+                        Visibility(
+                            visible: !_loginAuthMode, child: Text('drop down')),
+                        Visibility(
+                          visible: !_loginAuthMode,
+                          child: SizedBox(
+                            height: deviceHeight * 0.03,
+                          ),
+                        ),
+                        Visibility(
+                            visible: !_loginAuthMode, child: Text('DOB')),
+                        Visibility(
+                          visible: _loginAuthMode,
+                          child: SizedBox(
+                              height: deviceHeight * 0.03,
+                              child: GestureDetector(
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      right: deviceWidth * 0.1,
+                                    ),
+                                    child: Text(
+                                      'Forgot Password ?',
+                                      style: greyMinStyle,
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, RecoverPasswordScreen.routeName);
+                                },
+                              )),
+                        ),
+                        SizedBox(
+                          height: deviceHeight * 0.06,
+                        ),
+                        Container(
+                          height: deviceHeight * 0.06,
+                          width: deviceWidth * 0.8,
+                          decoration: BoxDecoration(
+                            borderRadius: borderRadiusSize,
+                            color: Colors.black,
+                          ),
+                          child: ElevatedButton(
+                            onPressed: _submit,
+                            style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: borderRadiusSize)),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                      colors: [Colors.red, Colors.yellow]),
+                                  borderRadius: borderRadiusSize),
+                              child: Container(
+                                // width: 00,
+                                height: 50,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  _loginAuthMode ? 'Log In' : 'Sign Up',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: deviceHeight * 0.035,
+                        ),
+                        SizedBox(
+                          height: deviceHeight * 0.03,
+                          child: Center(
+                            child: _loginAuthMode
+                                ? RichText(
+                                    text: TextSpan(
+                                        style: greyMinStyle,
+                                        children: [
+                                          const TextSpan(
+                                            text: 'Don\'t have an account ? ',
+                                          ),
+                                          TextSpan(
+                                            text: ' Register',
+                                            style: orangeMinStyle,
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                setState(() {
+                                                  _loginAuthMode = false;
+                                                });
+                                              },
+                                          ),
+                                        ]),
+                                  )
+                                : RichText(
+                                    text: TextSpan(
+                                        style: greyMinStyle,
+                                        children: [
+                                          const TextSpan(
+                                            text: 'Have an account ? ',
+                                          ),
+                                          TextSpan(
+                                            text: ' Login',
+                                            style: orangeMinStyle,
+                                            recognizer: TapGestureRecognizer()
+                                              ..onTap = () {
+                                                setState(() {
+                                                  _loginAuthMode = true;
+                                                });
+                                              },
+                                          ),
+                                        ]),
+                                  ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: deviceHeight * 0.04,
                         ),
                       ]),
                     ),
@@ -315,7 +501,16 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
                 SizedBox(
                   height: deviceHeight * 0.04,
-                )
+                  child: const Center(
+                      child: Text(
+                    'Chiboy @ Copyright',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                ),
               ],
             ),
           ),
