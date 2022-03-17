@@ -12,7 +12,7 @@ class WelcomeScreen extends StatelessWidget {
     final deviceHeight = MediaQuery.of(context).size.height;
     final deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(title: const Text("Welcome ")),
+      appBar: AppBar(title: const Text("User Sign In Details")),
       body: Container(
           decoration: BoxDecoration(
             color: Colors.grey[50],
@@ -25,8 +25,11 @@ class WelcomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('User Email : ' + user.emailAdress),
-                Text('User Password : ' + user.password),
+                Text('User Email: ' + user.emailAdress),
+                Text('User Password: ' + user.password),
+                Text('User Gender: ' + user.gender),
+                Text('User DOB: ' + user.dOB),
+                Text('User Location: ' + user.location),
               ],
             ),
           )),
