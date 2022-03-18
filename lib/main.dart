@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sign_in_screen_2/screens/login.dart';
+import 'package:sign_in_screen_2/screens/read_local_storage.dart';
 import 'package:sign_in_screen_2/screens/recover_password_screen.dart';
 import 'package:sign_in_screen_2/screens/register.dart';
 import 'package:sign_in_screen_2/screens/welcome_screen.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
             RecoverPasswordScreen.routeName: (context) =>
                 const RecoverPasswordScreen(),
             RegisterScreen.routeName: (context) => const RegisterScreen(),
+            ReadLocalStorage.routeName: (context) => const ReadLocalStorage()
           }),
     );
   }

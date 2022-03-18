@@ -1,8 +1,10 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_screen_2/screens/read_local_storage.dart';
+
+import 'dart:async';
 import 'package:sign_in_screen_2/screens/recover_password_screen.dart';
 import 'package:sign_in_screen_2/screens/welcome_screen.dart';
 
@@ -22,11 +24,14 @@ class _LogInScreenState extends State<LogInScreen> {
   bool _showConfirmPasswordError = false;
   bool _showDOBError = false;
   bool _showLocationError = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmedPassword = true;
   final TextEditingController _emailController = TextEditingController();
 
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _dateofBirthTextFieldController =
       TextEditingController();
+
   DateTime? selectedDate;
   final List<String> _locations = [
     "Abia",
@@ -76,7 +81,7 @@ class _LogInScreenState extends State<LogInScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_loginAuthMode) {
       if (!_formkey.currentState!.validate()) {
         return;
@@ -87,6 +92,14 @@ class _LogInScreenState extends State<LogInScreen> {
           !_showConfirmPasswordError &&
           !_showDOBError &&
           !_showLocationError) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setStringList('displayName', [
+          _emailController.text.toString(),
+          _passwordController.text.toString(),
+          _dateofBirthTextFieldController.text.toString(),
+          _selectedLocation.toString(),
+          _userGender
+        ]);
         Navigator.pushNamed(context, WelcomeScreen.routeName,
             arguments: User(
               emailAdress: _emailController.text.toString(),
@@ -302,7 +315,7 @@ class _LogInScreenState extends State<LogInScreen> {
                           height: deviceHeight * 0.06,
                           child: TextFormField(
                             maxLines: 1,
-                            obscureText: true,
+                            obscureText: _obscurePassword,
                             controller: _passwordController,
                             style: const TextStyle(fontSize: 10),
                             decoration: InputDecoration(
@@ -310,6 +323,18 @@ class _LogInScreenState extends State<LogInScreen> {
                               hintText: "Password",
                               hintStyle: greyMinStyle,
                               contentPadding: const EdgeInsets.all(0),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    size: 15),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                               prefixIcon: const Icon(
                                 Icons.key_outlined,
                                 size: 15,
@@ -362,7 +387,7 @@ class _LogInScreenState extends State<LogInScreen> {
                             height: deviceHeight * 0.06,
                             child: TextFormField(
                               maxLines: 1,
-                              obscureText: true,
+                              obscureText: _obscureConfirmedPassword,
                               style: const TextStyle(fontSize: 10),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -372,6 +397,19 @@ class _LogInScreenState extends State<LogInScreen> {
                                 prefixIcon: const Icon(
                                   Icons.key_outlined,
                                   size: 15,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                      _obscureConfirmedPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      size: 15),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmedPassword =
+                                          !_obscureConfirmedPassword;
+                                    });
+                                  },
                                 ),
                                 fillColor: Colors.white,
                                 filled: false,
@@ -409,71 +447,69 @@ class _LogInScreenState extends State<LogInScreen> {
                                 left: deviceWidth * 0.00,
                                 right: deviceWidth * 0.03,
                               ),
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: deviceWidth * 0.05,
-                                        bottom: 0,
-                                      ),
-                                      child: const Text(
-                                        'Please Select Gender: ',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                        ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: deviceWidth * 0.05,
+                                      bottom: 0,
+                                    ),
+                                    child: const Text(
+                                      'Please Select Gender: ',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        left: deviceWidth * 0.05,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Text('Male:',
-                                              style: TextStyle(
-                                                  fontSize: 11,
-                                                  color: Colors.black)),
-                                          Transform.scale(
-                                            scale: 0.5,
-                                            child: Radio(
-                                              value: "male",
-                                              groupValue: _userGender,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _userGender = value;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                          const Text(
-                                            'Female:',
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: deviceWidth * 0.05,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Text('Male:',
                                             style: TextStyle(
                                                 fontSize: 11,
-                                                color: Colors.black),
+                                                color: Colors.black)),
+                                        Transform.scale(
+                                          scale: 0.5,
+                                          child: Radio(
+                                            value: "male",
+                                            groupValue: _userGender,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _userGender = value;
+                                              });
+                                            },
                                           ),
-                                          Transform.scale(
-                                            scale: 0.5,
-                                            child: Radio(
-                                              value: "female",
-                                              groupValue: _userGender,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _userGender = value;
-                                                });
-                                              },
-                                            ),
+                                        ),
+                                        const Text(
+                                          'Female:',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.black),
+                                        ),
+                                        Transform.scale(
+                                          scale: 0.5,
+                                          child: Radio(
+                                            value: "female",
+                                            groupValue: _userGender,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _userGender = value;
+                                              });
+                                            },
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               )),
                         ),
                         Visibility(
@@ -634,7 +670,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 ),
                                 onTap: () {
                                   Navigator.pushNamed(
-                                      context, RecoverPasswordScreen.routeName);
+                                      context, ReadLocalStorage.routeName);
                                 },
                               )),
                         ),
@@ -725,18 +761,18 @@ class _LogInScreenState extends State<LogInScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: deviceHeight * 0.04,
-                child: const Center(
-                    child: Text(
-                  'Chiboy @ Copyright',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
-              ),
+              // SizedBox(
+              //   height: deviceHeight * 0.04,
+              //   child: const Center(
+              //       child: Text(
+              //     'Chiboy @ Copyright',
+              //     style: TextStyle(
+              //       color: Colors.black,
+              //       fontSize: 10,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   )),
+              // ),
             ],
           ),
         ),
