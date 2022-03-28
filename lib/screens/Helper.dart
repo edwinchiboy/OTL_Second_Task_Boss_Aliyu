@@ -24,9 +24,10 @@ class Storage {
     }
   }
 
-  Future<File> writeData(String data) async {
+  Future writeData(userName, password) async {
     final file = await localFile;
-    return file.writeAsString(data);
+    file.writeAsString(userName);
+    //file.writeAsString(password, mode: FileMode.append);
   }
 }
 

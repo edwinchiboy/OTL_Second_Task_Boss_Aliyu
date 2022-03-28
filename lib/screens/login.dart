@@ -266,7 +266,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               border: InputBorder.none,
                               hintText: "Email",
                               hintStyle: greyMinStyle,
-                              contentPadding: const EdgeInsets.all(0),
+                              // contentPadding: const EdgeInsets.all(0),
                               prefixIcon: const Icon(
                                 Icons.email_outlined,
                                 size: 15,
@@ -322,7 +322,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               border: InputBorder.none,
                               hintText: "Password",
                               hintStyle: greyMinStyle,
-                              contentPadding: const EdgeInsets.all(0),
+                              //contentPadding: const EdgeInsets.all(0),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                     _obscurePassword
@@ -393,7 +393,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 border: InputBorder.none,
                                 hintText: "Confirm Password",
                                 hintStyle: greyMinStyle,
-                                contentPadding: const EdgeInsets.all(0),
+                                // contentPadding: const EdgeInsets.all(0),
                                 prefixIcon: const Icon(
                                   Icons.key_outlined,
                                   size: 15,
@@ -544,7 +544,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 border: InputBorder.none,
                                 hintText: "enter date of Birth",
                                 hintStyle: greyMinStyle,
-                                contentPadding: const EdgeInsets.all(0),
+                                //contentPadding: const EdgeInsets.all(0),
                                 prefixIcon: const Icon(
                                   Icons.calendar_month_outlined,
                                   size: 15,
